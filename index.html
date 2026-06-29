@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Tend — care, together</title>
+<meta name="theme-color" content="#2f7d63" />
+<style>
+  :root{--phone:#fbfaf6;--ink:#22302a;--muted:#6f8079;--line:#e7e3d8;--brand:#2f7d63;--brand-soft:#e4f0ea;--accent:#e9a23b;--danger:#d4675a;--card:#fff}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--phone);color:var(--ink)}
+  a{color:var(--brand);text-decoration:none}
+  #root{max-width:480px;margin:0 auto;min-height:100vh}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--phone);position:relative;display:flex;flex-direction:column}
+  .topbar{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:9px}
+  .leaf{width:30px;height:30px;border-radius:9px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px}
+  .brand h1{font-size:19px;font-weight:700;letter-spacing:-.3px}
+  .screen{flex:1;overflow-y:auto;padding:0 18px 110px}
+  .eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:18px 2px 9px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(40,60,50,.04)}
+  .greet{font-size:23px;font-weight:700;letter-spacing:-.4px;margin:8px 2px 2px}
+  .sub2{color:var(--muted);font-size:13.5px;margin:0 2px 4px}
+  .oncall{background:linear-gradient(135deg,#2f7d63,#3d9a7b);color:#fff;border:none;border-radius:22px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+  .oncall .lbl{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.85;font-weight:700}
+  .oncall .who{display:flex;align-items:center;gap:12px;margin:12px 0 6px}
+  .oncall .who .big{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+  .oncall .who .name{font-size:21px;font-weight:700}
+  .oncall .who .sub{font-size:13px;opacity:.85}
+  .swap{margin-top:10px;background:rgba(255,255,255,.18);border:none;color:#fff;font-weight:600;font-size:13px;padding:9px 14px;border-radius:11px;cursor:pointer}
+  .row{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .tick{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);flex:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;background:transparent}
+  .tick.done{background:var(--brand);border-color:var(--brand)}
+  .rtxt{flex:1}
+  .rtxt .t{font-weight:600;font-size:15px}
+  .rtxt .t.struck{text-decoration:line-through;color:var(--muted)}
+  .rtxt .s{font-size:12.5px;color:var(--muted);margin-top:1px}
+  .pill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;background:var(--brand-soft);color:var(--brand);flex:none}
+  .pill.warn{background:#fbecd2;color:#b27a18}
+  .pill.appt{background:#e7ecfb;color:#4860c0}
+  .member{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .member:last-child{border-bottom:none}
+  .mav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;flex:none}
+  .member .mn{flex:1}
+  .member .mn .nm{font-weight:600;font-size:15px}
+  .member .mn .rl{font-size:12.5px;color:var(--muted)}
+  .badge{font-size:11px;font-weight:700;color:var(--brand);background:var(--brand-soft);padding:4px 10px;border-radius:20px}
+  .lockline{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-top:12px;justify-content:center}
+  .fab{position:fixed;left:50%;transform:translateX(calc(240px - 74px));bottom:96px;width:54px;height:54px;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:28px;box-shadow:0 8px 20px rgba(47,125,99,.45);cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center}
+  @media(max-width:520px){.fab{left:auto;right:20px;transform:none}}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;height:74px;background:rgba(251,250,246,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px 14px;z-index:25}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10.5px;font-weight:600}
+  .tab .ic{font-size:21px;line-height:1}
+  .tab.active{color:var(--brand)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--brand);color:#fff;border:none;border-radius:13px;padding:13px 18px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn.ghost{background:var(--brand-soft);color:var(--brand)}
+  .input{width:100%;border:1px solid var(--line);border-radius:13px;padding:13px 14px;font-size:15px;background:#fff;margin-bottom:10px;font-family:inherit}
+  .input:focus{outline:none;border-color:var(--brand)}
+  .label{font-size:12.5px;font-weight:600;color:var(--muted);margin:2px 2px 6px}
+  .center{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:28px 22px;max-width:480px;margin:0 auto}
+  .hero-leaf{width:56px;height:56px;border-radius:16px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:18px}
+  .h2{font-size:27px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+  .muted{color:var(--muted);font-size:14.5px;line-height:1.5}
+  .codebox{font-size:26px;font-weight:700;letter-spacing:4px;text-align:center;background:var(--brand-soft);color:var(--brand);border-radius:14px;padding:14px;margin:8px 0}
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:10px 18px;border-radius:30px;z-index:40;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .banner{background:#fbecd2;color:#7a5510;font-size:13px;padding:10px 14px;border-radius:12px;margin:10px 0;line-height:1.4}
+  .spin{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--muted);font-size:14px}
+  .linklike{background:none;border:none;color:var(--brand);font-weight:600;cursor:pointer;font-size:14px;padding:6px}
+  .modal-bg{position:fixed;inset:0;background:rgba(20,30,25,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60}
+  .modal{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:480px;padding:20px 20px 30px}
+  .seg{display:flex;gap:8px;margin-bottom:12px}
+  .seg button{flex:1;border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)}
+  .seg button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+  .progress{height:7px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:10px}
+  .progress>i{display:block;height:100%;background:var(--brand);border-radius:10px;transition:width .3s}
+</style>
+</head>
+<body>
+<div id="root"><div class="spin">Loading Tend…</div></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback } = React;
+
+/* ---------- config (publishable key is safe to embed) ---------- */
+const SUPABASE_URL = "https://awuhysvrzudccemjgzae.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4DQx0LJVu767zhAEwhUEWA_Ye89NynZ";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+/* ---------- helpers ---------- */
+const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const prettyDate = () => new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+const COLORS = ['#2f7d63','#4860c0','#e9a23b','#9a6cc0','#c0566a'];
+function initialsFrom(name){ const p=(name||'').trim().split(/\s+/).filter(Boolean); if(!p.length) return '🙂'; return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
+function timeAgo(ts){ const s=Math.floor((Date.now()-new Date(ts).getTime())/1000); if(s<60)return 'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+const KIND_PILL = { med:'pill', appt:'pill appt', task:'pill warn' };
+const KIND_LABEL = { med:'Meds', appt:'Appt', task:'Task' };
+const VAULT_CATS = [
+  {key:'doctors',icon:'👩‍⚕️',label:'Doctors & specialists'},
+  {key:'meds',icon:'💊',label:'Medication list'},
+  {key:'insurance',icon:'🪪',label:'Insurance & ID'},
+  {key:'documents',icon:'📄',label:'Important documents'},
+  {key:'emergency',icon:'🚨',label:'Emergency card'},
+];
+
+/* ---------- root ---------- */
+function App(){
+  const [booting,setBooting]=useState(true);
+  const [session,setSession]=useState(null);
+  const [hasSpace,setHasSpace]=useState(false);
+
+  const check = useCallback(async ()=>{
+    const { data:{ session } } = await sb.auth.getSession();
+    setSession(session);
+    if(session){
+      const { data } = await sb.from('memberships').select('space_id').limit(1);
+      setHasSpace(!!(data && data.length));
+    }
+    setBooting(false);
+  },[]);
+
+  useEffect(()=>{
+    check();
+    const { data:sub } = sb.auth.onAuthStateChange(()=>check());
+    return ()=> sub.subscription.unsubscribe();
+  },[check]);
+
+  if(booting) return <div className="spin">Loading Tend…</div>;
+  if(!session) return <Login/>;
+  if(!hasSpace) return <Onboarding onDone={check}/>;
+  return <Space session={session} onLeave={check}/>;
+}
+
+/* ---------- login ---------- */
+function Login(){
+  const [email,setEmail]=useState(''); const [sent,setSent]=useState(false);
+  const [busy,setBusy]=useState(false); const [err,setErr]=useState('');
+  async function send(e){
+    e.preventDefault(); setBusy(true); setErr('');
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await sb.auth.signInWithOtp({ email:email.trim(), options:{ emailRedirectTo:redirectTo } });
+    setBusy(false); error ? setErr(error.message) : setSent(true);
+  }
+  return (
+    <div className="center">
+      <div className="hero-leaf">🌿</div>
+      <div className="h2">Welcome to Tend</div>
+      <p className="muted" style={{marginBottom:22}}>A calm, shared home base for the family caring for someone you love.</p>
+      {sent ? (
+        <div className="card">
+          <div style={{fontWeight:700,fontSize:17,marginBottom:6}}>Check your email 📩</div>
+          <p className="muted">We sent a secure sign-in link to <b>{email}</b>. Tap it on this device to come back signed in.</p>
+          <button className="linklike" style={{marginTop:8}} onClick={()=>setSent(false)}>Use a different email</button>
+        </div>
+      ) : (
+        <form onSubmit={send}>
+          <div className="label">Your email</div>
+          <input className="input" type="email" required placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)} />
+          {err && <div className="banner">{err}</div>}
+          <button className="btn" disabled={busy||!email}>{busy?'Sending…':'Email me a sign-in link'}</button>
+          <p className="muted" style={{marginTop:14,textAlign:'center',fontSize:12.5}}>No passwords. We email you a one-tap link each time.</p>
+        </form>
+      )}
+    </div>
+  );
+}
+
+/* ---------- onboarding ---------- */
+function Onboarding({ onDone }){
+  const [mode,setMode]=useState('create'); const [name,setName]=useState('');
+  const [parent,setParent]=useState(''); const [code,setCode]=useState('');
+  const [busy,setBusy]=useState(false); const [err,setErr]=useState('');
+  async function submit(e){
+    e.preventDefault(); setBusy(true); setErr('');
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      await sb.from('profiles').upsert({ id:session.user.id, full_name:name.trim(), initials:initialsFrom(name), color:COLORS[Math.floor(Math.random()*COLORS.length)] });
+      if(mode==='create'){ const { error } = await sb.rpc('create_space',{ p_name:parent.trim() }); if(error) throw error; }
+      else { const { error } = await sb.rpc('join_space',{ p_code:code.trim() }); if(error) throw error; }
+      onDone();
+    }catch(e2){ setErr(e2.message||'Something went wrong'); setBusy(false); }
+  }
+  return (
+    <div className="center">
+      <div className="hero-leaf">🌿</div>
+      <div className="h2">Let's set up your space</div>
+      <p className="muted" style={{marginBottom:18}}>A care space is the shared home base for one person you're looking after.</p>
+      <div className="seg">
+        <button className={mode==='create'?'on':''} onClick={()=>setMode('create')}>Start a new space</button>
+        <button className={mode==='join'?'on':''} onClick={()=>setMode('join')}>Join with a code</button>
+      </div>
+      <form onSubmit={submit}>
+        <div className="label">Your name</div>
+        <input className="input" required placeholder="e.g. Rija" value={name} onChange={e=>setName(e.target.value)} />
+        {mode==='create' ? (<>
+          <div className="label">Who are you caring for?</div>
+          <input className="input" required placeholder="e.g. Mom" value={parent} onChange={e=>setParent(e.target.value)} />
+        </>) : (<>
+          <div className="label">Share code from your family</div>
+          <input className="input" required placeholder="e.g. 4F9A2C" style={{textTransform:'uppercase',letterSpacing:2}} value={code} onChange={e=>setCode(e.target.value)} />
+        </>)}
+        {err && <div className="banner">{err}</div>}
+        <button className="btn" disabled={busy}>{busy?'Setting up…':(mode==='create'?'Create care space':'Join space')}</button>
+      </form>
+    </div>
+  );
+}
+
+/* ---------- main app ---------- */
+function Space({ session, onLeave }){
+  const [tab,setTab]=useState('home');
+  const [loading,setLoading]=useState(true);
+  const [me,setMe]=useState(null);
+  const [space,setSpace]=useState(null);
+  const [members,setMembers]=useState([]);
+  const [items,setItems]=useState([]);
+  const [updates,setUpdates]=useState([]);
+  const [vault,setVault]=useState([]);
+  const [toast,setToast]=useState('');
+  const [modal,setModal]=useState(null);
+  const [draft,setDraft]=useState('');
+  const flash=(m)=>{ setToast(m); setTimeout(()=>setToast(''),1900); };
+
+  const loadAll=useCallback(async(spaceId)=>{
+    const [m,mem,it,up,vt]=await Promise.all([
+      sb.from('memberships').select('user_id, role, relationship, on_call').eq('space_id',spaceId),
+      sb.from('profiles').select('id, full_name, initials, color'),
+      sb.from('items').select('*').eq('space_id',spaceId).order('created_at'),
+      sb.from('updates').select('*').eq('space_id',spaceId).order('created_at',{ascending:false}).limit(20),
+      sb.from('vault_entries').select('*').eq('space_id',spaceId).order('created_at'),
+    ]);
+    const profById=Object.fromEntries((mem.data||[]).map(p=>[p.id,p]));
+    setMembers((m.data||[]).map(r=>({ ...r, profile:profById[r.user_id]||{} })));
+    setItems(it.data||[]); setUpdates(up.data||[]); setVault(vt.data||[]);
+  },[]);
+
+  const boot=useCallback(async()=>{
+    const { data:prof } = await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
+    setMe({ id:session.user.id, ...(prof||{}) });
+    const { data:mems } = await sb.from('memberships').select('space_id, spaces(id, name, join_code)').limit(1);
+    if(!mems||!mems.length){ onLeave(); return; }
+    setSpace(mems[0].spaces);
+    await loadAll(mems[0].spaces.id);
+    setLoading(false);
+  },[session,loadAll,onLeave]);
+  useEffect(()=>{ boot(); },[boot]);
+
+  async function toggleItem(it){
+    const done=it.last_done_on===todayStr(); const next=done?null:todayStr();
+    setItems(arr=>arr.map(x=>x.id===it.id?{...x,last_done_on:next}:x));
+    await sb.from('items').update({ last_done_on:next }).eq('id',it.id);
+  }
+  async function handOff(){
+    if(members.length<2){ flash('Invite family to hand off ↻'); return; }
+    const order=[...members]; const cur=order.findIndex(x=>x.on_call); const ni=(cur+1)%order.length;
+    const c=order[cur===-1?0:cur], n=order[ni];
+    await sb.from('memberships').update({on_call:false}).eq('space_id',space.id).eq('user_id',c.user_id);
+    await sb.from('memberships').update({on_call:true}).eq('space_id',space.id).eq('user_id',n.user_id);
+    await loadAll(space.id); flash((n.profile.full_name||'Next person')+' is on call ↻');
+  }
+  async function postUpdate(){
+    if(!draft.trim())return;
+    await sb.from('updates').insert({ space_id:space.id, user_id:me.id, body:draft.trim() });
+    setDraft(''); await loadAll(space.id); flash('Shared with the circle 💚');
+  }
+  async function addItem(f){ await sb.from('items').insert({ space_id:space.id, kind:f.kind, title:f.title, schedule_label:f.schedule_label, created_by:me.id }); setModal(null); await loadAll(space.id); flash('Added ✓'); }
+  async function addVault(f){ await sb.from('vault_entries').insert({ space_id:space.id, category:f.category, title:f.title, body:f.body, created_by:me.id }); setModal(null); await loadAll(space.id); flash('Saved to Key info 🔒'); }
+  async function signOut(){ await sb.auth.signOut(); onLeave(); }
+
+  if(loading) return <div className="spin">Loading your care space…</div>;
+
+  const prof=(id)=> (members.find(x=>x.user_id===id)||{}).profile || {};
+  const meName=(id)=> id===me.id ? ((prof(id).full_name||'You')+' (you)') : (prof(id).full_name||'Family');
+  const onCall=members.find(x=>x.on_call)||members[0];
+  const todays=items.filter(i=>i.kind!=='appt');
+  const doneCount=todays.filter(i=>i.last_done_on===todayStr()).length;
+  const pct=todays.length?Math.round(doneCount/todays.length*100):0;
+
+  return (
+    <div className="app">
+      <div className="topbar">
+        <div className="brand"><div className="leaf">🌿</div><h1>Tend</h1></div>
+        <div style={{display:'flex'}}>
+          {members.slice(0,4).map(m=>(
+            <div key={m.user_id} className="mav" style={{width:30,height:30,fontSize:12,marginLeft:-8,border:'2px solid var(--phone)',background:m.profile.color||'#2f7d63'}}>{m.profile.initials||'🙂'}</div>
+          ))}
+        </div>
+      </div>
+      <div className="screen">
+        {tab==='home' && (<>
+          <div className="greet">{space.name}'s care space</div>
+          <div className="sub2">{prettyDate()}</div>
+          <div className="oncall">
+            <div className="lbl">On call this week</div>
+            <div className="who">
+              <div className="big">{(onCall&&onCall.profile.initials)||'🙂'}</div>
+              <div><div className="name">{meName(onCall&&onCall.user_id)}</div><div className="sub">{(onCall&&onCall.relationship)||'Caregiver'} · checks in</div></div>
+            </div>
+            <button className="swap" onClick={handOff}>↻ Hand off to next person</button>
+          </div>
+          <div className="eyebrow">Today's plan</div>
+          <div className="card">
+            {todays.length===0 && <p className="muted">No meds or tasks yet. Tap + to add one.</p>}
+            {todays.map(it=>{ const done=it.last_done_on===todayStr(); return (
+              <div className="row" key={it.id}>
+                <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
+                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
+              </div>); })}
+            {todays.length>0 && <div className="progress"><i style={{width:pct+'%'}}/></div>}
+          </div>
+          <div className="eyebrow">From the circle</div>
+          <div className="card">
+            <textarea className="input" rows={2} placeholder={'Share an update about '+space.name+'…'} value={draft} onChange={e=>setDraft(e.target.value)} />
+            <button className="btn ghost" onClick={postUpdate} disabled={!draft.trim()}>Post update</button>
+          </div>
+          {updates.map(u=>(
+            <div className="card" key={u.id} style={{display:'flex',gap:12,alignItems:'flex-start'}}>
+              <div className="mav" style={{background:prof(u.user_id).color||'#4860c0'}}>{prof(u.user_id).initials||'🙂'}</div>
+              <div><div style={{fontWeight:600,fontSize:14}}>{meName(u.user_id)} <span style={{color:'var(--muted)',fontWeight:400,fontSize:12}}>· {timeAgo(u.created_at)}</span></div>
+              <div style={{fontSize:14,marginTop:3,color:'#3c4a44'}}>{u.body}</div></div>
+            </div>
+          ))}
+        </>)}
+
+        {tab==='schedule' && (<>
+          <div className="greet">Schedule</div>
+          <div className="sub2">Meds, checks & appointments</div>
+          <div className="eyebrow">Medications & tasks</div>
+          <div className="card">
+            {items.filter(i=>i.kind!=='appt').length===0 && <p className="muted">Nothing yet — tap + to add.</p>}
+            {items.filter(i=>i.kind!=='appt').map(it=>{ const done=it.last_done_on===todayStr(); return (
+              <div className="row" key={it.id}>
+                <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
+                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
+              </div>); })}
+          </div>
+          <div className="eyebrow">Upcoming appointments</div>
+          <div className="card">
+            {items.filter(i=>i.kind==='appt').length===0 && <p className="muted">No appointments yet.</p>}
+            {items.filter(i=>i.kind==='appt').map(it=>(
+              <div className="row" key={it.id}>
+                <div style={{width:30,height:30,borderRadius:9,background:'var(--brand-soft)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flex:'none'}}>🩺</div>
+                <div className="rtxt"><div className="t">{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className="pill appt">Appt</div>
+              </div>
+            ))}
+          </div>
+        </>)}
+
+        {tab==='circle' && (<>
+          <div className="greet">Care circle</div>
+          <div className="sub2">{members.length} {members.length===1?'person':'people'} looking after {space.name}</div>
+          <div className="eyebrow">Members</div>
+          <div className="card">
+            {members.map(m=>(
+              <div className="member" key={m.user_id}>
+                <div className="mav" style={{background:m.profile.color||'#2f7d63'}}>{m.profile.initials||'🙂'}</div>
+                <div className="mn"><div className="nm">{meName(m.user_id)}</div><div className="rl">{m.relationship||(m.role==='organizer'?'Organizer':'Member')}</div></div>
+                {m.on_call && <div className="badge">On call</div>}
+              </div>
+            ))}
+          </div>
+          <div className="card" style={{textAlign:'center',borderStyle:'dashed',color:'var(--brand)',fontWeight:600,cursor:'pointer'}} onClick={()=>setModal('invite')}>+ Invite a family member</div>
+          <div style={{textAlign:'center',marginTop:18}}><button className="linklike" onClick={signOut}>Sign out</button></div>
+        </>)}
+
+        {tab==='vault' && (<>
+          <div className="greet">Key info</div>
+          <div className="sub2">One safe place for what matters</div>
+          {VAULT_CATS.map(c=>{ const entries=vault.filter(v=>v.category===c.key); return (
+            <div key={c.key}>
+              <div className="eyebrow">{c.icon} {c.label}</div>
+              <div className="card">
+                {entries.length===0 && <p className="muted" style={{fontSize:13}}>Nothing saved yet.</p>}
+                {entries.map(v=>(<div className="row" key={v.id}><div className="rtxt"><div className="t">{v.title}</div>{v.body&&<div className="s">{v.body}</div>}</div></div>))}
+              </div>
+            </div>); })}
+          <div className="lockline">🔒 Private to your circle</div>
+        </>)}
+      </div>
+
+      {(tab==='home'||tab==='schedule') && <button className="fab" onClick={()=>setModal('item')}>+</button>}
+      {tab==='vault' && <button className="fab" onClick={()=>setModal('vault')}>+</button>}
+      {toast && <div className="toast">{toast}</div>}
+      {modal==='item' && <ItemModal onClose={()=>setModal(null)} onSave={addItem}/>}
+      {modal==='vault' && <VaultModal onClose={()=>setModal(null)} onSave={addVault}/>}
+      {modal==='invite' && <InviteModal code={space.join_code} onClose={()=>setModal(null)} onCopy={()=>flash('Code copied 🔗')}/>}
+
+      <div className="tabbar">
+        {[['home','🏠','Home'],['schedule','📅','Schedule'],['circle','👥','Circle'],['vault','🔒','Key info']].map(([k,ic,lb])=>(
+          <button key={k} className={'tab '+(tab===k?'active':'')} onClick={()=>setTab(k)}><span className="ic">{ic}</span>{lb}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ItemModal({ onClose, onSave }){
+  const [kind,setKind]=useState('med'); const [title,setTitle]=useState(''); const [sched,setSched]=useState('');
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="h2" style={{fontSize:20,marginBottom:14}}>Add to schedule</div>
+        <div className="seg">
+          {[['med','Medication'],['task','Health task'],['appt','Appointment']].map(([k,l])=>(<button key={k} className={kind===k?'on':''} onClick={()=>setKind(k)}>{l}</button>))}
+        </div>
+        <div className="label">Title</div>
+        <input className="input" placeholder={kind==='appt'?'Dr. Alvarez — Cardiology':'Metformin 500mg'} value={title} onChange={e=>setTitle(e.target.value)} />
+        <div className="label">When</div>
+        <input className="input" placeholder={kind==='appt'?'Thu Jul 2 · 10:30 AM':'8:00 AM · daily'} value={sched} onChange={e=>setSched(e.target.value)} />
+        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({kind,title:title.trim(),schedule_label:sched.trim()})}>Add</button>
+        <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+function VaultModal({ onClose, onSave }){
+  const [category,setCategory]=useState('doctors'); const [title,setTitle]=useState(''); const [body,setBody]=useState('');
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="h2" style={{fontSize:20,marginBottom:14}}>Add key info</div>
+        <div className="label">Category</div>
+        <select className="input" value={category} onChange={e=>setCategory(e.target.value)}>
+          {VAULT_CATS.map(c=>(<option key={c.key} value={c.key}>{c.label}</option>))}
+        </select>
+        <div className="label">Title</div>
+        <input className="input" placeholder="Dr. Alvarez — Cardiology" value={title} onChange={e=>setTitle(e.target.value)} />
+        <div className="label">Details</div>
+        <textarea className="input" rows={3} placeholder="Phone, address, notes…" value={body} onChange={e=>setBody(e.target.value)} />
+        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({category,title:title.trim(),body:body.trim()})}>Save</button>
+        <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+function InviteModal({ code, onClose, onCopy }){
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="h2" style={{fontSize:20,marginBottom:6}}>Invite family</div>
+        <p className="muted">Share this code. They tap "Join with a code" when they sign up.</p>
+        <div className="codebox">{code}</div>
+        <button className="btn" onClick={()=>{ if(navigator.clipboard) navigator.clipboard.writeText(code); onCopy(); }}>Copy code</button>
+        <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Done</button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
