@@ -183,7 +183,10 @@ function Onboarding({ onDone }){
     e.preventDefault(); setBusy(true); setErr('');
     try{
       const { data:{ session } } = await sb.auth.getSession();
-      await sb.from('profiles').upsert({ id:session.user.id, full_name:name.trim(), initials:initialsFrom(name), color:COLORS[Math.floor(Math.random()*COLORS.length)] });
+      let uid=(session&&session.user&&session.user.id)||null;
+      if(!uid){ const _u=await sb.auth.getUser(); uid=_u&&_u.data&&_u.data.user&&_u.data.user.id; }
+      if(!uid){ throw new Error('Your sign-in didn\u2019t finish loading. Please reload and sign in again.'); }
+      await sb.from('profiles').upsert({ id:uid, full_name:name.trim(), initials:initialsFrom(name), color:COLORS[Math.floor(Math.random()*COLORS.length)] });
       if(mode==='create'){ const { error } = await sb.rpc('create_space',{ p_name:parent.trim() }); if(error) throw error; }
       else { const { error } = await sb.rpc('join_space',{ p_code:code.trim() }); if(error) throw error; }
       onDone();
@@ -244,12 +247,19 @@ function Space({ session, onLeave }){
   },[]);
 
   const boot=useCallback(async()=>{
-    const { data:prof } = await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
-    setMe({ id:session.user.id, ...(prof||{}) });
-    const { data:mems } = await sb.from('memberships').select('space_id, spaces(id, name, join_code)').limit(1);
+    let uid=(session&&session.user&&session.user.id)||null;
+    if(!uid){ const _u=await sb.auth.getUser(); uid=_u&&_u.data&&_u.data.user&&_u.data.user.id; }
+    if(!uid){ onLeave(); return; }
+    const { data:prof } = await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
+    setMe({ id:uid, ...(prof||{}) });
+    const { data:mems, error:memErr } = await sb.from('memberships').select('space_id, spaces(id, name, join_code)').limit(1);
+    if(memErr){ setLoading(false); alert('Could not load your care space: '+memErr.message); return; }
     if(!mems||!mems.length){ onLeave(); return; }
-    setSpace(mems[0].spaces);
-    await loadAll(mems[0].spaces.id);
+    let _sp = mems[0].spaces;
+    if(!_sp && mems[0].space_id){ const { data:_srow } = await sb.from('spaces').select('id, name, join_code').eq('id',mems[0].space_id).maybeSingle(); _sp=_srow; }
+    if(!_sp){ onLeave(); return; }
+    setSpace(_sp);
+    await loadAll(_sp.id);
     setLoading(false);
   },[session,loadAll,onLeave]);
   useEffect(()=>{ boot(); },[boot]);
