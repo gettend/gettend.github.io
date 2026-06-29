@@ -86,7 +86,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<script type="text/babel" data-presets="react">
+<script type="text/jsx-app" id="appsrc">
 const { useState, useEffect, useCallback } = React;
 
 /* ---------- config (publishable key is safe to embed) ---------- */
@@ -460,6 +460,15 @@ function InviteModal({ code, onClose, onCopy }){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+<script>
+  (function(){
+    var src = document.getElementById('appsrc').textContent;
+    var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+    var s = document.createElement('script');
+    s.textContent = out;
+    document.body.appendChild(s);
+  })();
 </script>
 </body>
 </html>
