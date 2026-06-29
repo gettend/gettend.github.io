@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 <title>Tend — care, together</title>
 <meta name="theme-color" content="#2f7d63" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Tend" />
 <style>
-  :root{--phone:#fbfaf6;--ink:#22302a;--muted:#6f8079;--line:#e7e3d8;--brand:#2f7d63;--brand-soft:#e4f0ea;--accent:#e9a23b;--danger:#d4675a;--card:#fff}
+  :root{--phone:#fbfaf6;--ink:#22302a;--muted:#6f8079;--line:#e7e3d8;--brand:#2f7d63;--brand-soft:#e4f0ea;--accent:#e9a23b;--danger:#d4675a;--card:#ffffff}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--phone);color:var(--ink)}
@@ -47,6 +53,13 @@
   .member .mn .nm{font-weight:600;font-size:15px}
   .member .mn .rl{font-size:12.5px;color:var(--muted)}
   .badge{font-size:11px;font-weight:700;color:var(--brand);background:var(--brand-soft);padding:4px 10px;border-radius:20px}
+  .vault{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .vault:last-child{border-bottom:none}
+  .vico{width:38px;height:38px;border-radius:11px;background:var(--brand-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .vault .vt{flex:1}
+  .vault .vt .a{font-weight:600;font-size:15px}
+  .vault .vt .b{font-size:12.5px;color:var(--muted)}
+  .chev{color:var(--muted);font-size:18px}
   .lockline{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-top:12px;justify-content:center}
   .fab{position:fixed;left:50%;transform:translateX(calc(240px - 74px));bottom:96px;width:54px;height:54px;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:28px;box-shadow:0 8px 20px rgba(47,125,99,.45);cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center}
   @media(max-width:520px){.fab{left:auto;right:20px;transform:none}}
@@ -57,7 +70,7 @@
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--brand);color:#fff;border:none;border-radius:13px;padding:13px 18px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
   .btn:disabled{opacity:.55;cursor:default}
   .btn.ghost{background:var(--brand-soft);color:var(--brand)}
-  .input{width:100%;border:1px solid var(--line);border-radius:13px;padding:13px 14px;font-size:15px;background:#fff;margin-bottom:10px;font-family:inherit}
+  .input{width:100%;border:1px solid var(--line);border-radius:13px;padding:13px 14px;font-size:16px;background:#fff;margin-bottom:10px;font-family:inherit}
   .input:focus{outline:none;border-color:var(--brand)}
   .label{font-size:12.5px;font-weight:600;color:var(--muted);margin:2px 2px 6px}
   .center{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:28px 22px;max-width:480px;margin:0 auto}
@@ -67,6 +80,8 @@
   .codebox{font-size:26px;font-weight:700;letter-spacing:4px;text-align:center;background:var(--brand-soft);color:var(--brand);border-radius:14px;padding:14px;margin:8px 0}
   .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:10px 18px;border-radius:30px;z-index:40;box-shadow:0 6px 20px rgba(0,0,0,.25)}
   .banner{background:#fbecd2;color:#7a5510;font-size:13px;padding:10px 14px;border-radius:12px;margin:10px 0;line-height:1.4}
+  .notice{background:var(--brand-soft);color:var(--brand);font-size:13px;padding:11px 14px;border-radius:14px;margin:6px 0 12px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .notice button{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-weight:700;font-size:12.5px;cursor:pointer;flex:none}
   .spin{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--muted);font-size:14px}
   .linklike{background:none;border:none;color:var(--brand);font-weight:600;cursor:pointer;font-size:14px;padding:6px}
   .modal-bg{position:fixed;inset:0;background:rgba(20,30,25,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60}
@@ -76,6 +91,13 @@
   .seg button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
   .progress{height:7px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:10px}
   .progress>i{display:block;height:100%;background:var(--brand);border-radius:10px;transition:width .3s}
+  .alarm-bg{position:fixed;inset:0;background:rgba(20,30,25,.6);display:flex;align-items:center;justify-content:center;z-index:80;padding:22px}
+  .alarm{background:#fff;border-radius:24px;width:100%;max-width:360px;padding:26px 22px;text-align:center;animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+  .alarm .bell{font-size:46px}
+  .alarm .at{font-size:22px;font-weight:700;margin:8px 0 2px}
+  .alarm .asub{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .timechip{font-size:11px;font-weight:700;color:var(--brand);background:var(--brand-soft);padding:3px 8px;border-radius:20px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -87,7 +109,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
 <script type="text/jsx-app" id="appsrc">
-const { useState, useEffect, useCallback } = React;
+const { useState, useEffect, useCallback, useRef } = React;
 
 /* ---------- config (publishable key is safe to embed) ---------- */
 const SUPABASE_URL = "https://awuhysvrzudccemjgzae.supabase.co";
@@ -98,10 +120,12 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 /* ---------- helpers ---------- */
 const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const nowHHMM = () => { const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
 const prettyDate = () => new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
 const COLORS = ['#2f7d63','#4860c0','#e9a23b','#9a6cc0','#c0566a'];
 function initialsFrom(name){ const p=(name||'').trim().split(/\s+/).filter(Boolean); if(!p.length) return '🙂'; return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
 function timeAgo(ts){ const s=Math.floor((Date.now()-new Date(ts).getTime())/1000); if(s<60)return 'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function sinceLabel(it){ if(!it||it.kind==='appt'||!it.created_at) return ''; const d=new Date(it.created_at); const days=Math.max(0,Math.floor((Date.now()-d.getTime())/86400000)); const date=d.toLocaleDateString(undefined,{month:'short',day:'numeric'}); return 'taking since '+date+' · '+days+(days===1?' day':' days'); }
 const KIND_PILL = { med:'pill', appt:'pill appt', task:'pill warn' };
 const KIND_LABEL = { med:'Meds', appt:'Appt', task:'Task' };
 const VAULT_CATS = [
@@ -112,6 +136,25 @@ const VAULT_CATS = [
   {key:'emergency',icon:'🚨',label:'Emergency card'},
 ];
 
+/* ---------- alarm sound + fired-tracking ---------- */
+let _ac;
+function unlockAudio(){ try{ _ac=_ac||new (window.AudioContext||window.webkitAudioContext)(); if(_ac.state==='suspended') _ac.resume(); }catch(e){} }
+function beep(){
+  try{
+    unlockAudio();
+    for(let i=0;i<3;i++){
+      const t=_ac.currentTime+i*0.55;
+      const o=_ac.createOscillator(), g=_ac.createGain();
+      o.connect(g); g.connect(_ac.destination); o.type='sine'; o.frequency.value=880;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.3,t+0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
+      o.start(t); o.stop(t+0.5);
+    }
+  }catch(e){}
+}
+const firedKey = () => 'tend_fired_'+todayStr();
+function getFired(){ try{ return new Set(JSON.parse(localStorage.getItem(firedKey())||'[]')); }catch(e){ return new Set(); } }
+function markFired(id){ const s=getFired(); s.add(id); localStorage.setItem(firedKey(), JSON.stringify([...s])); }
+
 /* ---------- root ---------- */
 function App(){
   const [booting,setBooting]=useState(true);
@@ -119,12 +162,14 @@ function App(){
   const [hasSpace,setHasSpace]=useState(false);
 
   const check = useCallback(async ()=>{
-    const { data:{ session } } = await sb.auth.getSession();
-    setSession(session);
-    if(session){
-      const { data } = await sb.from('memberships').select('space_id').limit(1);
-      setHasSpace(!!(data && data.length));
-    }
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      setSession(session);
+      if(session){
+        const { data } = await sb.from('memberships').select('space_id').limit(1);
+        setHasSpace(!!(data && data.length));
+      } else { setHasSpace(false); }
+    }catch(e){ /* ignore */ }
     setBooting(false);
   },[]);
 
@@ -136,11 +181,11 @@ function App(){
 
   if(booting) return <div className="spin">Loading Tend…</div>;
   if(!session) return <Login/>;
-  if(!hasSpace) return <Onboarding onDone={check}/>;
+  if(!hasSpace) return <Onboarding session={session} onDone={check}/>;
   return <Space session={session} onLeave={check}/>;
 }
 
-/* ---------- login ---------- */
+/* ---------- login (code OR magic link) ---------- */
 function Login(){
   const [email,setEmail]=useState(''); const [sent,setSent]=useState(false);
   const [busy,setBusy]=useState(false); const [err,setErr]=useState('');
@@ -158,8 +203,8 @@ function Login(){
       {sent ? (
         <div className="card">
           <div style={{fontWeight:700,fontSize:17,marginBottom:6}}>Check your email 📩</div>
-          <p className="muted">We sent a secure sign-in link to <b>{email}</b>. Tap it on this device to come back signed in.</p>
-          <button className="linklike" style={{marginTop:8}} onClick={()=>setSent(false)}>Use a different email</button>
+          <p className="muted">We sent a one-tap sign-in link to <b>{email}</b>. <b>Open this email on the device you want to use Tend on</b> (your phone or computer) and tap the link — you'll come right back here, signed in.</p>
+          <button className="linklike" style={{marginTop:10}} onClick={()=>{setSent(false);setErr('');}}>Use a different email</button>
         </div>
       ) : (
         <form onSubmit={send}>
@@ -167,7 +212,7 @@ function Login(){
           <input className="input" type="email" required placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)} />
           {err && <div className="banner">{err}</div>}
           <button className="btn" disabled={busy||!email}>{busy?'Sending…':'Email me a sign-in link'}</button>
-          <p className="muted" style={{marginTop:14,textAlign:'center',fontSize:12.5}}>No passwords. We email you a one-tap link each time.</p>
+          <p className="muted" style={{marginTop:14,textAlign:'center',fontSize:12.5}}>No passwords. Tap the emailed link on the device you'll use Tend on.</p>
         </form>
       )}
     </div>
@@ -175,18 +220,19 @@ function Login(){
 }
 
 /* ---------- onboarding ---------- */
-function Onboarding({ onDone }){
+function Onboarding({ session, onDone }){
   const [mode,setMode]=useState('create'); const [name,setName]=useState('');
   const [parent,setParent]=useState(''); const [code,setCode]=useState('');
   const [busy,setBusy]=useState(false); const [err,setErr]=useState('');
+
   async function submit(e){
     e.preventDefault(); setBusy(true); setErr('');
     try{
-      const { data:{ session } } = await sb.auth.getSession();
-      let uid=(session&&session.user&&session.user.id)||null;
-      if(!uid){ const _u=await sb.auth.getUser(); uid=_u&&_u.data&&_u.data.user&&_u.data.user.id; }
-      if(!uid){ throw new Error('Your sign-in didn\u2019t finish loading. Please reload and sign in again.'); }
-      await sb.from('profiles').upsert({ id:uid, full_name:name.trim(), initials:initialsFrom(name), color:COLORS[Math.floor(Math.random()*COLORS.length)] });
+      const { data:{ user } } = await sb.auth.getUser();
+      const uid = (user && user.id) || (session && session.user && session.user.id);
+      if(!uid){ throw new Error('Your sign-in expired. Please refresh and sign in again.'); }
+      const { error:perr } = await sb.from('profiles').upsert({ id:uid, full_name:name.trim(), initials:initialsFrom(name), color:COLORS[Math.floor(Math.random()*COLORS.length)] });
+      if(perr) throw perr;
       if(mode==='create'){ const { error } = await sb.rpc('create_space',{ p_name:parent.trim() }); if(error) throw error; }
       else { const { error } = await sb.rpc('join_space',{ p_code:code.trim() }); if(error) throw error; }
       onDone();
@@ -231,6 +277,9 @@ function Space({ session, onLeave }){
   const [toast,setToast]=useState('');
   const [modal,setModal]=useState(null);
   const [draft,setDraft]=useState('');
+  const [alarm,setAlarm]=useState(null);
+  const [notif,setNotif]=useState(typeof Notification!=='undefined'?Notification.permission:'unsupported');
+  const itemsRef=useRef([]);
   const flash=(m)=>{ setToast(m); setTimeout(()=>setToast(''),1900); };
 
   const loadAll=useCallback(async(spaceId)=>{
@@ -243,31 +292,56 @@ function Space({ session, onLeave }){
     ]);
     const profById=Object.fromEntries((mem.data||[]).map(p=>[p.id,p]));
     setMembers((m.data||[]).map(r=>({ ...r, profile:profById[r.user_id]||{} })));
-    setItems(it.data||[]); setUpdates(up.data||[]); setVault(vt.data||[]);
+    const list=it.data||[]; setItems(list); itemsRef.current=list;
+    setUpdates(up.data||[]); setVault(vt.data||[]);
   },[]);
 
   const boot=useCallback(async()=>{
-    let uid=(session&&session.user&&session.user.id)||null;
-    if(!uid){ const _u=await sb.auth.getUser(); uid=_u&&_u.data&&_u.data.user&&_u.data.user.id; }
-    if(!uid){ onLeave(); return; }
-    const { data:prof } = await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
-    setMe({ id:uid, ...(prof||{}) });
-    const { data:mems, error:memErr } = await sb.from('memberships').select('space_id, spaces(id, name, join_code)').limit(1);
-    if(memErr){ setLoading(false); alert('Could not load your care space: '+memErr.message); return; }
+    const { data:prof } = await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
+    setMe({ id:session.user.id, ...(prof||{}) });
+    const { data:mems } = await sb.from('memberships').select('space_id, spaces(id, name, join_code)').limit(1);
     if(!mems||!mems.length){ onLeave(); return; }
-    let _sp = mems[0].spaces;
-    if(!_sp && mems[0].space_id){ const { data:_srow } = await sb.from('spaces').select('id, name, join_code').eq('id',mems[0].space_id).maybeSingle(); _sp=_srow; }
-    if(!_sp){ onLeave(); return; }
-    setSpace(_sp);
-    await loadAll(_sp.id);
+    let sp = mems[0].spaces;
+    if(!sp){ const { data:s2 } = await sb.from('spaces').select('id, name, join_code').eq('id',mems[0].space_id).maybeSingle(); sp=s2; }
+    if(!sp){ onLeave(); return; }
+    setSpace(sp);
+    await loadAll(sp.id);
     setLoading(false);
   },[session,loadAll,onLeave]);
   useEffect(()=>{ boot(); },[boot]);
 
+  /* reminder/alarm engine — fires while the app is open or installed */
+  function fireAlarm(it){
+    setAlarm(it); beep();
+    try{ if(typeof Notification!=='undefined' && Notification.permission==='granted'){
+      new Notification('Tend reminder ⏰', { body: it.title + (it.schedule_label?(' · '+it.schedule_label):''), icon:'/icon-512.png', tag:'tend-'+it.id });
+    }}catch(e){}
+  }
+  useEffect(()=>{
+    const tick=()=>{
+      const hhmm=nowHHMM(); const fired=getFired();
+      const due=(itemsRef.current||[]).find(it=> it.remind_at===hhmm && it.last_done_on!==todayStr() && !fired.has(it.id+'@'+hhmm));
+      if(due){ markFired(due.id+'@'+hhmm); fireAlarm(due); }
+    };
+    const iv=setInterval(tick,15000); tick();
+    return ()=>clearInterval(iv);
+  },[]);
+
+  async function enableReminders(){
+    unlockAudio();
+    try{ const p=await Notification.requestPermission(); setNotif(p); if(p==='granted'){ beep(); flash('Reminders on 🔔'); } }
+    catch(e){ flash('Reminders work while Tend is open'); }
+  }
+
   async function toggleItem(it){
     const done=it.last_done_on===todayStr(); const next=done?null:todayStr();
-    setItems(arr=>arr.map(x=>x.id===it.id?{...x,last_done_on:next}:x));
+    const upd=(itemsRef.current||[]).map(x=>x.id===it.id?{...x,last_done_on:next}:x);
+    setItems(upd); itemsRef.current=upd;
     await sb.from('items').update({ last_done_on:next }).eq('id',it.id);
+    try{
+      if(next){ await sb.from('completions').upsert({ item_id:it.id, space_id:space.id, done_on:todayStr(), done_by:me.id }, { onConflict:'item_id,done_on' }); }
+      else { await sb.from('completions').delete().eq('item_id',it.id).eq('done_on',todayStr()); }
+    }catch(e){}
   }
   async function handOff(){
     if(members.length<2){ flash('Invite family to hand off ↻'); return; }
@@ -282,9 +356,12 @@ function Space({ session, onLeave }){
     await sb.from('updates').insert({ space_id:space.id, user_id:me.id, body:draft.trim() });
     setDraft(''); await loadAll(space.id); flash('Shared with the circle 💚');
   }
-  async function addItem(f){ await sb.from('items').insert({ space_id:space.id, kind:f.kind, title:f.title, schedule_label:f.schedule_label, created_by:me.id }); setModal(null); await loadAll(space.id); flash('Added ✓'); }
+  async function addItem(f){ await sb.from('items').insert({ space_id:space.id, kind:f.kind, title:f.title, schedule_label:f.schedule_label, remind_at:f.remind_at||null, created_by:me.id }); setModal(null); await loadAll(space.id); flash(f.remind_at?'Added · reminder set ⏰':'Added ✓'); }
   async function addVault(f){ await sb.from('vault_entries').insert({ space_id:space.id, category:f.category, title:f.title, body:f.body, created_by:me.id }); setModal(null); await loadAll(space.id); flash('Saved to Key info 🔒'); }
   async function signOut(){ await sb.auth.signOut(); onLeave(); }
+
+  function snooze(it){ setAlarm(null); setTimeout(()=>fireAlarm(it), 10*60*1000); flash('Snoozed 10 min ⏰'); }
+  function alarmDone(it){ toggleItem(it); setAlarm(null); }
 
   if(loading) return <div className="spin">Loading your care space…</div>;
 
@@ -294,6 +371,7 @@ function Space({ session, onLeave }){
   const todays=items.filter(i=>i.kind!=='appt');
   const doneCount=todays.filter(i=>i.last_done_on===todayStr()).length;
   const pct=todays.length?Math.round(doneCount/todays.length*100):0;
+  const showNotifNudge = notif==='default' && items.some(i=>i.remind_at);
 
   return (
     <div className="app">
@@ -309,6 +387,7 @@ function Space({ session, onLeave }){
         {tab==='home' && (<>
           <div className="greet">{space.name}'s care space</div>
           <div className="sub2">{prettyDate()}</div>
+          {showNotifNudge && <div className="notice"><span>🔔 Turn on reminders so alarms pop up</span><button onClick={enableReminders}>Enable</button></div>}
           <div className="oncall">
             <div className="lbl">On call this week</div>
             <div className="who">
@@ -323,7 +402,7 @@ function Space({ session, onLeave }){
             {todays.map(it=>{ const done=it.last_done_on===todayStr(); return (
               <div className="row" key={it.id}>
                 <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
-                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
               </div>); })}
             {todays.length>0 && <div className="progress"><i style={{width:pct+'%'}}/></div>}
@@ -345,13 +424,14 @@ function Space({ session, onLeave }){
         {tab==='schedule' && (<>
           <div className="greet">Schedule</div>
           <div className="sub2">Meds, checks & appointments</div>
+          {notif==='default' && <div className="notice"><span>🔔 Turn on reminder alarms</span><button onClick={enableReminders}>Enable</button></div>}
           <div className="eyebrow">Medications & tasks</div>
           <div className="card">
             {items.filter(i=>i.kind!=='appt').length===0 && <p className="muted">Nothing yet — tap + to add.</p>}
             {items.filter(i=>i.kind!=='appt').map(it=>{ const done=it.last_done_on===todayStr(); return (
               <div className="row" key={it.id}>
                 <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
-                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
               </div>); })}
           </div>
@@ -361,7 +441,7 @@ function Space({ session, onLeave }){
             {items.filter(i=>i.kind==='appt').map(it=>(
               <div className="row" key={it.id}>
                 <div style={{width:30,height:30,borderRadius:9,background:'var(--brand-soft)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flex:'none'}}>🩺</div>
-                <div className="rtxt"><div className="t">{it.title}</div>{it.schedule_label&&<div className="s">{it.schedule_label}</div>}</div>
+                <div className="rtxt"><div className="t">{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className="pill appt">Appt</div>
               </div>
             ))}
@@ -407,6 +487,19 @@ function Space({ session, onLeave }){
       {modal==='vault' && <VaultModal onClose={()=>setModal(null)} onSave={addVault}/>}
       {modal==='invite' && <InviteModal code={space.join_code} onClose={()=>setModal(null)} onCopy={()=>flash('Code copied 🔗')}/>}
 
+      {alarm && (
+        <div className="alarm-bg">
+          <div className="alarm">
+            <div className="bell">⏰</div>
+            <div className="at">{alarm.title}</div>
+            <div className="asub">{KIND_LABEL[alarm.kind]}{alarm.schedule_label?(' · '+alarm.schedule_label):''} — time for {space.name}</div>
+            <button className="btn" onClick={()=>alarmDone(alarm)}>Mark done ✓</button>
+            <button className="btn ghost" style={{marginTop:8}} onClick={()=>snooze(alarm)}>Snooze 10 min</button>
+            <button className="linklike" style={{width:'100%',marginTop:6}} onClick={()=>setAlarm(null)}>Dismiss</button>
+          </div>
+        </div>
+      )}
+
       <div className="tabbar">
         {[['home','🏠','Home'],['schedule','📅','Schedule'],['circle','👥','Circle'],['vault','🔒','Key info']].map(([k,ic,lb])=>(
           <button key={k} className={'tab '+(tab===k?'active':'')} onClick={()=>setTab(k)}><span className="ic">{ic}</span>{lb}</button>
@@ -417,7 +510,7 @@ function Space({ session, onLeave }){
 }
 
 function ItemModal({ onClose, onSave }){
-  const [kind,setKind]=useState('med'); const [title,setTitle]=useState(''); const [sched,setSched]=useState('');
+  const [kind,setKind]=useState('med'); const [title,setTitle]=useState(''); const [sched,setSched]=useState(''); const [remind,setRemind]=useState('');
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
@@ -427,9 +520,11 @@ function ItemModal({ onClose, onSave }){
         </div>
         <div className="label">Title</div>
         <input className="input" placeholder={kind==='appt'?'Dr. Alvarez — Cardiology':'Metformin 500mg'} value={title} onChange={e=>setTitle(e.target.value)} />
-        <div className="label">When</div>
-        <input className="input" placeholder={kind==='appt'?'Thu Jul 2 · 10:30 AM':'8:00 AM · daily'} value={sched} onChange={e=>setSched(e.target.value)} />
-        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({kind,title:title.trim(),schedule_label:sched.trim()})}>Add</button>
+        <div className="label">Notes (optional)</div>
+        <input className="input" placeholder={kind==='appt'?'Thu Jul 2 · Sana driving':'With breakfast · daily'} value={sched} onChange={e=>setSched(e.target.value)} />
+        <div className="label">⏰ Remind at (optional)</div>
+        <input className="input" type="time" value={remind} onChange={e=>setRemind(e.target.value)} />
+        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({kind,title:title.trim(),schedule_label:sched.trim(),remind_at:remind||null})}>Add</button>
         <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Cancel</button>
       </div>
     </div>
@@ -460,7 +555,7 @@ function InviteModal({ code, onClose, onCopy }){
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="h2" style={{fontSize:20,marginBottom:6}}>Invite family</div>
-        <p className="muted">Share this code. They tap "Join with a code" when they sign up.</p>
+          <p className="muted">Share this code. They tap "Join with a code" when they sign up.</p>
         <div className="codebox">{code}</div>
         <button className="btn" onClick={()=>{ if(navigator.clipboard) navigator.clipboard.writeText(code); onCopy(); }}>Copy code</button>
         <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Done</button>
