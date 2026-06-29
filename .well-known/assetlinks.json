@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.gettend.twa",
+    "sha256_cert_fingerprints": ["6C:81:22:BF:02:C2:9B:9B:22:3B:14:32:BB:DA:30:A4:21:57:87:97:50:7C:07:D3:52:25:1A:01:21:1B:CA:9A"]
+  }
+}]
