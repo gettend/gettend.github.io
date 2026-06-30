@@ -278,6 +278,8 @@ function Space({ session, onLeave }){
   const [toast,setToast]=useState('');
   const [modal,setModal]=useState(null);
   const [draft,setDraft]=useState('');
+  const [optItem,setOptItem]=useState(null);
+  const [editing,setEditing]=useState(null);
   const [alarm,setAlarm]=useState(null);
   const [notif,setNotif]=useState(typeof Notification!=='undefined'?Notification.permission:'unsupported');
   const itemsRef=useRef([]);
@@ -359,6 +361,8 @@ function Space({ session, onLeave }){
   }
   async function addItem(f){ await sb.from('items').insert({ space_id:space.id, kind:f.kind, title:f.title, schedule_label:f.schedule_label, remind_at:f.remind_at||null, created_by:me.id }); setModal(null); await loadAll(space.id); flash(f.remind_at?'Added · reminder set ⏰':'Added ✓'); }
   async function addVault(f){ await sb.from('vault_entries').insert({ space_id:space.id, category:f.category, title:f.title, body:f.body, created_by:me.id }); setModal(null); await loadAll(space.id); flash('Saved to Key info 🔒'); }
+  async function updateItem(it, f){ await sb.from('items').update({ kind:f.kind, title:f.title, schedule_label:f.schedule_label, remind_at:f.remind_at||null }).eq('id',it.id); setEditing(null); await loadAll(space.id); flash('Updated ✓'); }
+  async function deleteItem(it){ const next=(itemsRef.current||[]).filter(x=>x.id!==it.id); setItems(next); itemsRef.current=next; setOptItem(null); await sb.from('items').delete().eq('id',it.id); flash('Removed'); }
   async function signOut(){ await sb.auth.signOut(); onLeave(); }
 
   function snooze(it){ setAlarm(null); setTimeout(()=>fireAlarm(it), 10*60*1000); flash('Snoozed 10 min ⏰'); }
@@ -403,7 +407,7 @@ function Space({ session, onLeave }){
             {todays.map(it=>{ const done=it.last_done_on===todayStr(); return (
               <div className="row" key={it.id}>
                 <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
-                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
+                <div className="rtxt" style={{cursor:'pointer'}} onClick={()=>setOptItem(it)}><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
               </div>); })}
             {todays.length>0 && <div className="progress"><i style={{width:pct+'%'}}/></div>}
@@ -432,7 +436,7 @@ function Space({ session, onLeave }){
             {items.filter(i=>i.kind!=='appt').map(it=>{ const done=it.last_done_on===todayStr(); return (
               <div className="row" key={it.id}>
                 <div className={'tick '+(done?'done':'')} onClick={()=>toggleItem(it)}>{done?'✓':''}</div>
-                <div className="rtxt"><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
+                <div className="rtxt" style={{cursor:'pointer'}} onClick={()=>setOptItem(it)}><div className={'t '+(done?'struck':'')}>{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className={KIND_PILL[it.kind]}>{KIND_LABEL[it.kind]}</div>
               </div>); })}
           </div>
@@ -442,7 +446,7 @@ function Space({ session, onLeave }){
             {items.filter(i=>i.kind==='appt').map(it=>(
               <div className="row" key={it.id}>
                 <div style={{width:30,height:30,borderRadius:9,background:'var(--brand-soft)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flex:'none'}}>🩺</div>
-                <div className="rtxt"><div className="t">{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
+                <div className="rtxt" style={{cursor:'pointer'}} onClick={()=>setOptItem(it)}><div className="t">{it.title}{it.remind_at&&<span className="timechip">⏰ {it.remind_at}</span>}</div>{(it.schedule_label||sinceLabel(it)) && <div className="s">{[it.schedule_label, sinceLabel(it)].filter(Boolean).join(' · ')}</div>}</div>
                 <div className="pill appt">Appt</div>
               </div>
             ))}
@@ -485,6 +489,8 @@ function Space({ session, onLeave }){
       {tab==='vault' && <button className="fab" onClick={()=>setModal('vault')}>+</button>}
       {toast && <div className="toast">{toast}</div>}
       {modal==='item' && <ItemModal onClose={()=>setModal(null)} onSave={addItem}/>}
+      {editing && <ItemModal initial={editing} onClose={()=>setEditing(null)} onSave={(f)=>updateItem(editing,f)}/>}
+      {optItem && <ItemOptionsModal item={optItem} onEdit={()=>{ setEditing(optItem); setOptItem(null); }} onDelete={()=>deleteItem(optItem)} onClose={()=>setOptItem(null)}/>}
       {modal==='vault' && <VaultModal onClose={()=>setModal(null)} onSave={addVault}/>}
       {modal==='invite' && <InviteModal code={space.join_code} onClose={()=>setModal(null)} onCopy={()=>flash('Code copied 🔗')}/>}
 
@@ -510,12 +516,12 @@ function Space({ session, onLeave }){
   );
 }
 
-function ItemModal({ onClose, onSave }){
-  const [kind,setKind]=useState('med'); const [title,setTitle]=useState(''); const [sched,setSched]=useState(''); const [remind,setRemind]=useState('');
+function ItemModal({ onClose, onSave, initial }){
+  const [kind,setKind]=useState((initial&&initial.kind)||'med'); const [title,setTitle]=useState((initial&&initial.title)||''); const [sched,setSched]=useState((initial&&initial.schedule_label)||''); const [remind,setRemind]=useState((initial&&initial.remind_at)||'');
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <div className="h2" style={{fontSize:20,marginBottom:14}}>Add to schedule</div>
+        <div className="h2" style={{fontSize:20,marginBottom:14}}>{initial?'Edit item':'Add to schedule'}</div>
         <div className="seg">
           {[['med','Medication'],['task','Health task'],['appt','Appointment']].map(([k,l])=>(<button key={k} className={kind===k?'on':''} onClick={()=>setKind(k)}>{l}</button>))}
         </div>
@@ -525,7 +531,7 @@ function ItemModal({ onClose, onSave }){
         <input className="input" placeholder={kind==='appt'?'Thu Jul 2 · Sana driving':'With breakfast · daily'} value={sched} onChange={e=>setSched(e.target.value)} />
         <div className="label">⏰ Remind at (optional)</div>
         <input className="input" type="time" value={remind} onChange={e=>setRemind(e.target.value)} />
-        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({kind,title:title.trim(),schedule_label:sched.trim(),remind_at:remind||null})}>Add</button>
+        <button className="btn" disabled={!title.trim()} onClick={()=>onSave({kind,title:title.trim(),schedule_label:sched.trim(),remind_at:remind||null})}>{initial?'Save changes':'Add'}</button>
         <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Cancel</button>
       </div>
     </div>
@@ -551,12 +557,32 @@ function VaultModal({ onClose, onSave }){
     </div>
   );
 }
+function ItemOptionsModal({ item, onEdit, onDelete, onClose }){
+  const [confirm,setConfirm]=useState(false);
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="h2" style={{fontSize:19,marginBottom:2}}>{item.title}</div>
+        <p className="muted" style={{marginBottom:16}}>{KIND_LABEL[item.kind]}{item.schedule_label?(' · '+item.schedule_label):''}{item.remind_at?(' · ⏰ '+item.remind_at):''}</p>
+        {!confirm ? (<>
+          <button className="btn ghost" onClick={onEdit}>Edit</button>
+          <button className="btn" style={{background:'var(--danger)',marginTop:8}} onClick={()=>setConfirm(true)}>Delete</button>
+        </>) : (<>
+          <p className="muted" style={{marginBottom:12}}>Remove "{item.title}" for good? Its history is removed too.</p>
+          <button className="btn" style={{background:'var(--danger)'}} onClick={onDelete}>Yes, delete</button>
+          <button className="btn ghost" style={{marginTop:8}} onClick={()=>setConfirm(false)}>Keep it</button>
+        </>)}
+        <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
 function InviteModal({ code, onClose, onCopy }){
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="h2" style={{fontSize:20,marginBottom:6}}>Invite family</div>
-          <p className="muted">Share this code. They tap "Join with a code" when they sign up.</p>
+        <p className="muted">Share this code. They tap "Join with a code" when they sign up.</p>
         <div className="codebox">{code}</div>
         <button className="btn" onClick={()=>{ if(navigator.clipboard) navigator.clipboard.writeText(code); onCopy(); }}>Copy code</button>
         <button className="linklike" style={{width:'100%',marginTop:6}} onClick={onClose}>Done</button>
@@ -578,3 +604,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
+>
